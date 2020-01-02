@@ -1,0 +1,30 @@
+* LCR Dicegame
+Inspired by the children's game LCR (complete rules found [[https://www.dicegamedepot.com/lcr-dice-game-rules/][here]] and can be ordered from amazon [[https://www.amazon.com/LCR%C2%AE-Left-Center-RightTM-Dice/dp/B003I64OT6][here]]).
+
+** Getting started
+You should be able to run the code in the "simulation.wppl" script in the webppl online REPL found at [[http://webppl.org/]].
+
+** Summary of the Rules
+Play consists of 2+ players each starting with a select number of tokens (in the official rules, 3 tokens). On each players turn, she will roll three 6-sided dice. On each die, there are the following options:
+
+1. "R" (x1) - Pass a token to the right
+2. "L" (x1) - Pass a token to the left
+3. "C" (x1) - Put a token into the center pot. No tokens can be removed from this spot.
+4. "." (x3) - Do nothing.
+
+Note that there is a 1/2 probability of rolling a "." and a 1/2 probability that you will have to lose a token.
+
+If you have less than three tokens, roll the number of dice equal to the number of tokens remaining. Note that this means you remain in the game even if you have no tokens as someone next to you might give you their tokens.
+
+You win if you are the last player having any tokens at all.
+
+** Purpose of this project
+This code was written as an attempt to answer the question: "How many coins do we expect to remain outside the center pot at the conclusion of a game?"
+
+** Extending
+By changing the condition and the return value of the =gameplay= function, we can change the 
+
+
+** TODO
+- [ ] Pass "turn count" through the recursive function
+- [ ] Label the x-axis and y-axis of the histogram
