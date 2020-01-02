@@ -1,0 +1,111 @@
+var testRotates = function () {
+  var arr = _.range(5)
+  print(rotate(arr))
+  print(rotateN(arr, 1))
+  
+  print(rotate(rotate(arr)))
+  print(rotateN(arr, -3))
+}
+
+// rotate all elements of array to the right one
+// ([a], int) -> [a]
+var rotate = function(arr) {
+  var out = _.concat(_.tail(arr), _.head(arr))
+  out
+}
+
+// Rotate to the right by 'n' values. If negative, rotate left by 'n'
+// ([a], int) -> [a]
+var rotateN = function(arr, n) {
+  var out = n > 0 ? 
+      _.concat(_.takeRight(arr, arr.length - n), _.take(arr, n)) : 
+      _.concat(_.takeRight(arr, -n), _.take(arr, arr.length - (-n)))
+  out
+}
+
+// Roll N number of die. Return result as an array
+// (Distribution, int) -> [str]
+var rollN = function(die, n) {
+  var out = map(function(x) {sample(die)}, _.range(n))
+  out
+}
+
+// Initialize an array of length n with 0
+// int -> [num]
+var zeros = function(n) {
+  var out = map(function(x) {0}, _.range(n))
+  out
+}
+
+// Add two arrays of equal length
+// ([num], [num]) -> [num]
+var add = function(a1, a2) {
+  map2(function(x, y) {x + y}, a1, a2)
+}
+
+// Calculate change in token count of all players from a dice roll
+// R -> idx 1 gets +1, idx 0 gets -1
+// C -> idx 0 gets -1, idx 0 gets -1
+// L -> tail() gets +1, idx 0 gets -1
+// d -> nothing
+// ([str], [int]) -> [num]
+var dieVal2diff = function(roll, amts) {
+  var spacerRL = zeros(amts.length - 2)
+  
+  var modArr = roll == "L" ? _.concat([-1, 1], spacerRL) : 
+               roll == "R" ? _.concat([-1], spacerRL, [1]) : 
+               roll == "C" ? _.concat([-1], zeros(amts.length - 1)) :
+               zeros(amts.length)
+  modArr
+}
+
+// Determine if the game should end or not
+// [int] -> bool
+var gameEnds = function(amts) { 
+  filter(function(x) {x != 0}, amts).length == 1
+}
+
+
+// Gameplay will proceed as follows: 
+// - If only one person has any coins, the game ends
+// - first player rolls (<= their amount of coins)
+// - from result, distribute coins accordingly
+// - Reorder the players and repeat the round from new amounts
+var round = function(die, amts){
+  if (gameEnds(amts)) {
+    return amts
+  }
+  else {
+    var amt = _.head(amts)
+    var nDie = amt < 3 ? amt : 3
+    var rollResult = rollN(die, nDie)
+
+  
+    var change = map(function(r) {dieVal2diff(r, amts)}, rollResult)
+    var diff = reduce(function(x, acc) {add(x, acc)},zeros(amts.length), change)
+    var newAmts = add(diff, amts)
+  
+    return round(die, rotate(newAmts))
+  }
+}
+
+var die = Categorical({vs: ["R", "L", "C", "d", "d", "d"]})
+
+var gameplay = function(die, nPlayers, initAmt) {
+  var amts = map(function(x){initAmt}, _.range(nPlayers))
+  var result = round(die, amts)
+  
+  condition(true)
+  return _.max(result)
+}
+
+// DEFINE EXPERIMENT
+var initAmt = 3
+var nPlayers = 3
+var players = _.range(nPlayers)
+
+var gameDist = Infer({method: "MCMC"}, function() {
+  gameplay(die, nPlayers, initAmt)
+})
+
+viz(gameDist)
